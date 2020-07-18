@@ -6,52 +6,63 @@
         <link rel="stylesheet" href="/css/styles.css">
     </head>
     <body>
-        <!-- Find Player Section -->
-        <div id="loginSection">
-            <div class="centered-form">
-                <div class="centered-form__box">
-                    <h1>Multiplayer Game</h1>
-                    <form id="joiningForm" action="/game.html">
-                        <label>Player Name:</label>
-                        <input type="text" id="userName" name="userName" placeholder="Player name" required>
-                        <input type="hidden" id="game" name="game" value="air-warfare" />
-                        <button id="submitButton">Play</button>
-                    </form>
-    
-                    <div id="loader" style="text-align: center; display: none;"><img src="./img/loader.gif" title="loader" /></div>
-                </div>
-            </div>
-        </div>
+        <div id="content"></div>
         
-        <!-- Game Section -->
-        <div id="gameSection" style="display:none">
-            <div class="centered-form">
-                <div class="player_box" id="players"></div>
-                
-                <input type="hidden" id="score" name="score" value="0" />
-                <button type="button" id="updateScore" style="position: absolute; width: 200px;">Update Score</button>
-            </div>
-        
-        
-            <script id="game-template" type="text/html">
-                <div class="game">
-                    <div class="player_name">
-                        <h3>Name: {{firstPlayerName}}</h3>
-                        <h3>Score: {{firstPlayerScore}}</h3>
-                    </div>
-                    <div class="player_name">
-                        <h3>Name: {{secondPlayerName}}</h3>
-                        <h3>Score: {{secondPlayerScore}}</h3>
-                    </div>
-                </div>
-            </script>
-        </div>
-
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script> -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
-        <script src="/js/game.js"></script>
-        
+        <script>
+            const socket = io();
+            function showConent (page, callback) {
+                (window.event).preventDefault();
+                let { game } = Qs.parse(location.search, { ignoreQueryPrefix: true })
+                const fileConfig = {
+                    'index': {'html': 'index.html', 'js':'/js/index.js'},
+                    'game': {'html': 'game.html', 'js':'/js/game.js'}
+                };
+
+                let configIndex = page.includes('game') ? 'game' : 'index';
+                if(game) {
+                    configIndex = 'game';
+                }
+                fetch(`http://localhost:3000/partial/${page}`)
+                .then((response) => response.text())
+                .then((html) => {
+                    document.querySelector("#content").innerHTML = html;
+
+                    //Remove old script
+                    let body = document.querySelector('body');
+                    body.removeChild(body.lastElementChild);
+
+                    //Add new script
+                    var tag = document.createElement("script");
+                    tag.src = fileConfig[configIndex]['js'];
+                    document.querySelector("body").append(tag);
+
+                    callback();
+                })
+                .catch((error) => {
+                    console.warn(error);
+                });
+            }
+
+            (function ready(callback) {
+                if (document.readyState !== 'loading') {
+                    // Document is already ready, call the callback directly
+                    callback();
+                } else if (document.addEventListener) {
+                    // All modern browsers to register DOMContentLoaded
+                    document.addEventListener('DOMContentLoaded', callback);
+                } else {
+                    // Old IE browsers
+                    document.attachEvent('onreadystatechange', function() {
+                        if (document.readyState === 'complete') {
+                            callback();
+                        }
+                    });
+                }
+            })(() => showConent('matchPlayer.html', () => {}));
+        </script>
+        <script></script>
     </body>
 </html>

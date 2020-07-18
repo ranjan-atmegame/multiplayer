@@ -21,7 +21,6 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 app.use(express.static(publicDirectoryPath))
 
 io.on('connection', (socket) => {
-    console.log(getAllData());
     socket.on('join', ({userName, game}, callback) => {
         const { error, user } = matchPlayer(socket.id, userName, game)
 
@@ -46,8 +45,10 @@ io.on('connection', (socket) => {
 
     socket.on('updateScore', (score, callback) => {
         let {room, users} = updatePlayingUserScore(socket.id, score);
+        if(!users.length) {
+            callback('Error: Room not found')
+        }
         io.to(room).emit('join', users);
-
         callback()
     })
 
@@ -58,7 +59,7 @@ io.on('connection', (socket) => {
         }
     })
 })
-    
+
 server.listen(port, () => {
     console.log(`Server is up on port ${port}!`)
 })

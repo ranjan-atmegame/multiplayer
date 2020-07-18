@@ -1,13 +1,11 @@
-const socket = io()
-
 // Elements=============
 //Login Section
-const $joiningForm = document.querySelector("#joiningForm");
-const $userNameField = document.querySelector("#joiningForm #userName");
-const $submitButton = document.querySelector("#submitButton");
-const $loader       = document.querySelector("#loader");
-const $loginSection = document.querySelector("#loginSection");
-const $gameSection = document.querySelector("#gameSection");
+// const $joiningForm = document.querySelector("#joiningForm");
+// const $userNameField = document.querySelector("#joiningForm #userName");
+// const $submitButton = document.querySelector("#submitButton");
+// const $loader       = document.querySelector("#loader");
+// const $loginSection = document.querySelector("#loginSection");
+// const $gameSection = document.querySelector("#gameSection");
 //Game Section
 const $updateScore = document.querySelector("#updateScore");
 const $score = document.querySelector("#score");
@@ -18,36 +16,9 @@ const gameTemplate = document.querySelector('#game-template').innerHTML
 
 //Options===============
 //Login Section
-const game = document.querySelector("#game").value;
+// const game = document.querySelector("#game").value;
 
 //Events================
-$joiningForm.addEventListener('submit', (e) => {
-    e.preventDefault()
-    userName = $userNameField.value;
-    $loader.style.display = "block";
-    $submitButton.setAttribute('disabled', 'disabled')
-
-    socket.emit('join', { userName, game }, (error) => {
-        if (error) {
-            alert(error)
-            location.href = '/'
-        }
-
-        $loader.style.display = "none";
-        $submitButton.removeAttribute('disabled');
-        
-        $loginSection.style.display = "none";
-        $gameSection.style.display = "block";
-        
-        socket.emit('showGame', (error) => {
-            if (error) {
-                alert(error)
-                location.href = '/'
-            }
-        })
-    })
-})
-
 socket.on('join', (users) => {
     if(users.length === 1) {
         firstPlayerName = users[0].name;
@@ -70,10 +41,7 @@ socket.on('join', (users) => {
     $players.innerHTML = html;
 });
 
-$updateScore.addEventListener('click', (e) => {
-// const updateScore = () => {
-    let score = $score.value;
-    score++;
+const updateScore = (score) => {
     $updateScore.setAttribute('disabled', 'disabled')
     socket.emit('updateScore', score, (error) => {
         $updateScore.removeAttribute('disabled')
@@ -83,6 +51,19 @@ $updateScore.addEventListener('click', (e) => {
 
         $score.value = score;
     })
+}
+
+$updateScore.addEventListener('click', () => {
+    let score = $score.value;
+    score++;
+    updateScore(score);
 });
 
-// setTimeout(updateScore, 5000);
+socket.emit('showGame', (error) => {
+    if (error) {
+        alert(error)
+        location.href = '/'
+    }
+
+    console.log('Emitted show game')
+})

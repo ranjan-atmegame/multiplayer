@@ -1,0 +1,23 @@
+<!-- Game Section -->
+<div id="gameSection">
+    <div class="centered-form">
+        <div class="player_box" id="players"></div>
+        
+        <input type="hidden" id="score" name="score" value="0" />
+        <button type="button" id="updateScore" style="position: absolute; width: 200px;">Update Score</button>
+    </div>
+
+
+    <script id="game-template" type="text/html">
+        <div class="game">
+            <div class="player_name">
+                <h3>Name: {{firstPlayerName}}</h3>
+                <h3>Score: {{firstPlayerScore}}</h3>
+            </div>
+            <div class="player_name">
+                <h3>Name: {{secondPlayerName}}</h3>
+                <h3>Score: {{secondPlayerScore}}</h3>
+            </div>
+        </div>
+    </script>
+</div>

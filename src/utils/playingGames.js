@@ -129,55 +129,71 @@ const removePlayingPlayer = (gameIndex, roomIndex, userId) => {
 }
 
 const removePlayer = (id) => {
-    let userIndex = findUserIndex(id);
-    if(userIndex !== -1) {
-        let {game, room} = findUser(id);
+    try {
+        let userIndex = findUserIndex(id);
+        if(userIndex !== -1) {
+            let {game, room} = findUser(id);
 
-        let gameIndex = findPlayingGameIndex(game);
-        let {rooms} = playingGames[gameIndex];
-        
-        let roomIndex = findRoomIndex(room);
-        let {users} = rooms[roomIndex];
-        
-        return removePlayingPlayer(gameIndex, roomIndex, id);   
+            let gameIndex = findPlayingGameIndex(game);
+            let {rooms} = playingGames[gameIndex];
+            let roomIndex = findRoomIndex(room);
+            let {users} = rooms[roomIndex];
+
+            return removePlayingPlayer(gameIndex, roomIndex, id);
+        }
+    } catch(e) {
+        //Need to add Log into file.
+        return {};
     }
 }
 
 const getUsersRoomScore = (userId) => {
-    const {game, room} = findUser(userId);
+    try {
+        const {game, room} = findUser(userId);
 
-    let index = findPlayingGameIndex(game);
-    if(index === -1) {
-        throw new Error("Error: Game not found");
+        let index = findPlayingGameIndex(game);
+        if(index === -1) {
+            throw new Error("Error: Game not found");
+        }
+
+        let {rooms} = playingGames[index];
+        let roomIndex = findRoomIndex(room);
+        let {users} = rooms[roomIndex];
+
+        return {room, users};
+    } catch(e) {
+        //Need to add Log into file.
+        return {room: {}, users: []};
     }
-
-    let {rooms} = playingGames[index];
-    
-    let roomIndex = findRoomIndex(room);
-    let {users} = rooms[roomIndex];
-    
-    return {room, users};
 }
 
 const updatePlayingUserScore = (userId, userScore) => {
-    let userIndex = findUserIndex(userId);
-    const {game, room} = getUsers()[userIndex];
+    try {
+        let userIndex = findUserIndex(userId);
+        if(userIndex === -1) {
+            throw new Error("User not found");
+        }
+        const {game, room} = getUsers()[userIndex];
 
-    let gameIndex = findPlayingGameIndex(game);
-    if(gameIndex === -1) {
-        throw new Error("Error: Game not found");
+        let gameIndex = findPlayingGameIndex(game);
+        if(gameIndex === -1) {
+            throw new Error("Error: Game not found");
+        }
+
+        let {rooms} = playingGames[gameIndex];
+
+        let roomIndex = findRoomIndex(room);
+        let {users} = rooms[roomIndex];
+
+        let playginUserIndex = users.findIndex(user => user.id === userId);
+        users[playginUserIndex] = {...users[playginUserIndex], score:userScore};
+
+        updateUserScore(userId, userScore);
+        return {room, users};
+    } catch(e) {
+        //Need to add Log into file.
+        return {room: {}, users: []}
     }
-
-    let {rooms} = playingGames[gameIndex];
-    
-    let roomIndex = findRoomIndex(room);
-    let {users} = rooms[roomIndex];
-    
-    let playginUserIndex = users.findIndex(user => user.id === userId);
-    users[playginUserIndex] = {...users[playginUserIndex], score:userScore};
-
-    updateUserScore(userId, userScore);
-    return {room, users};
 }
 
 module.exports = {
