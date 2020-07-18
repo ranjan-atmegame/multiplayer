@@ -159,36 +159,18 @@ const getUsersRoomScore = (userId) => {
     return {room, users};
 }
 
-let userIndex = gameIndex = roomIndex = -1;
-let game;
 const updatePlayingUserScore = (userId, userScore) => {
-    //If code block need to be change, when we will have switch room functionality on player close game.
-    if(userIndex !== -1) {
-        let {room} = getUsers()[userIndex];
-
-
-        let {rooms} = playingGames[gameIndex];
-        let {users} = rooms[roomIndex];
-
-        let playginUserIndex = users.findIndex(user => user.id === userId);
-        users[playginUserIndex] = {...users[playginUserIndex], score:userScore};
-
-        updateUserScore(userId, userScore);
-        return {room, users};
-    }
-
-    console.log("index not set.");
-    userIndex = findUserIndex(userId);
+    let userIndex = findUserIndex(userId);
     const {game, room} = getUsers()[userIndex];
 
-    gameIndex = findPlayingGameIndex(game);
+    let gameIndex = findPlayingGameIndex(game);
     if(gameIndex === -1) {
         throw new Error("Error: Game not found");
     }
 
     let {rooms} = playingGames[gameIndex];
     
-    roomIndex = findRoomIndex(room);
+    let roomIndex = findRoomIndex(room);
     let {users} = rooms[roomIndex];
     
     let playginUserIndex = users.findIndex(user => user.id === userId);
